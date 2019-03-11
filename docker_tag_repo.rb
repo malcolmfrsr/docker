@@ -10,7 +10,11 @@ class PromoteReleaseCandidate
           "DockerBuild" : "sudo docker build -t imqs/mm --build-arg netrc=\"$(cat ~/.netrc)\" --build-arg ssh_prv_key=\"$(cat ~/.ssh/id_rsa)\" --build-arg ssh_pub_key=\"$(cat ~/.ssh/id_rsa.pub)\" ."
 }')
 
-    puts (json)
+
+    # Store the json oblects in varaibles
+    repo = json["GitRepo"]
+    docker_service_name = json["DockerServiceName"]
+    docker_buils_command = json["DockerBuild"]
   end
 end
 
