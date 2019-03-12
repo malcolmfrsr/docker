@@ -27,25 +27,29 @@ class PromoteReleaseCandidate
       git_repo = Git.open (repo_dir)
 
 
-      `cd #{repo_dir}`
-      begin
-        # Get the build number
-        version_number = `git describe --tags`.to_f
-        version_number = version_number + 1
-        puts(`git tag #{version_number}`)
-      rescue
-        version_number = `git tag 1.0`.to_f
+      Dir.chdir(repo_dir)
+      # Get the build number
+      tag = `git describe --tags 2>&1`
+      puts tag
+      if (tag.to_s.include? "fatal: No names found, cannot describe anything")
+        puts(`git tag 1.0`)
+      else
+        if tag.tr("\n", "").is_float?
+          version_number = tag.tr("\n", "").to_f
+          version_number = version_number + 1
+          puts(`git tag #{version_number}`)
+        end
       end
 
-      output = `git push --tags`
-      puts (output);
-
-      # If there is no build number <tag> : Create one.
-
-      # Else increment existing
-
       # Then build
+      puts (`#{docker_buils_command}`)
     }
+  end
+end
+
+class String
+  def is_float?
+    /\A[+-]?\d+[.]\d+\z/ === self
   end
 end
 
