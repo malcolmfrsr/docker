@@ -1,9 +1,6 @@
 require 'json'
-require 'git'
 
 class PromoteReleaseCandidate
-
-
   def self.make_permalink()
     json = JSON.parse('{
           "GitRepo" : "git@github.com:IMQS/mm.git",
@@ -25,12 +22,13 @@ class PromoteReleaseCandidate
       #Clone repo locally
       puts ("This is the where we specify the directory.")
       repo_dir = 'mm'
-      # Todo : Get from json
-      git_repo = Git.clone(repository_name, repo_dir) unless File.directory?(repo_dir)
-      git_repo = Git.open (repo_dir)
 
-      puts ("changinging into the directory.")
-      Dir.chdir(repo_dir)
+      if !File.directory?(repo_dir)
+        puts `mkdir #{repo_dir}`
+        puts `cd #{repo_dir}`
+      end
+       puts `git clone #{repository_name}`
+
       # Get the build number
       tag = `git describe --tags 2>&1`
       puts tag
