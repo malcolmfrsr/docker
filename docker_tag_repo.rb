@@ -11,9 +11,11 @@ class PromoteReleaseCandidate
           "DockerBuild" : "sudo docker build -t imqs/mm --build-arg netrc=\"$(cat ~/.netrc)\" --build-arg ssh_prv_key=\"$(cat ~/.ssh/id_rsa)\" --build-arg ssh_pub_key=\"$(cat ~/.ssh/id_rsa.pub)\" ."
 }')
 
+    puts ("start the scriopt.")
     release_candidates = []
     release_candidates[0] = json
 
+    puts ("We are about to itterate throu the json objects.")
     release_candidates.each { |repo|
       # Store the json oblects in varaibles
       repository_name = repo["GitRepo"]
@@ -21,12 +23,13 @@ class PromoteReleaseCandidate
       docker_buils_command = repo["DockerBuild"]
 
       #Clone repo locally
+      puts ("This is the where we specify the directory.")
       repo_dir = 'mm'
       # Todo : Get from json
       git_repo = Git.clone(repository_name, repo_dir) unless File.directory?(repo_dir)
       git_repo = Git.open (repo_dir)
 
-
+      puts ("changinging into the directory.")
       Dir.chdir(repo_dir)
       # Get the build number
       tag = `git describe --tags 2>&1`
