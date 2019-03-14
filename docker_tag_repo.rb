@@ -15,21 +15,28 @@ class PromoteReleaseCandidate
       prepare_version(repository_name, branch)
 
       # Then build
-      puts (`#{docker_build_command}`)
+     # puts (`#{docker_build_command}`)
     }
   end
 
   def self.prepare_version(repository_name, branch)
     repository = GitRepository.new(repository_name, branch)
     tag = repository.fetch_latest_tag
-    puts tag
+    current_commit = repository.fetch_revision("HEAD")
+    last_tagged_commit = repository.fetch_revision(tag)
+    if ((current_commit) == (last_tagged_commit))
+      puts "Nothing has changed. Keeping #{tag}"
+      return tag
+    end
+
     if (tag.to_s.include? "fatal: No names found, cannot describe anything")
       puts(`git tag v1.0`)
     else
       if tag.tr("\n", "").tr("v", "").is_float?
         version_number = tag.tr("\n", "").tr("v", "").to_f
         version_number = version_number + 1
-        puts(`git tag v#{version_number}`)
+        repository.tag("v#{version_number}")
+        return version_number
       end
     end
   end
@@ -57,10 +64,18 @@ class GitRepository
     return gitrepo
   end
 
+  def fetch_revision(commit)
+    return `git rev-parse #{commit}`.tr("\n", "")
+  end
+
   # Fetches git tags from the command line and outputs as stdout
   def fetch_tags
-    tag = tag("-l \"#{VERSION_PREFIX}*\"  --sort=-#{VERSION_PREFIX}:refname").split("\n")
-    return tag
+    clean_tags = []
+    tag("-l \"#{VERSION_PREFIX}*\"  --sort=-#{VERSION_PREFIX}:refname").split("\n").each { |vtag|
+      clean_tags.push(vtag) if vtag.match(/\A[v]\d+[.]\d+\z/)
+    }
+
+    return clean_tags
   end
 
   def fetch_latest_tag
@@ -78,7 +93,6 @@ class GitRepository
 end
 
 class String
-  # ToDO : modify to include "v"
   def is_float?
     /\A[+-]?\d+[.]\d+\z/ === self
   end
