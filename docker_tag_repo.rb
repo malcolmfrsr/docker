@@ -1,5 +1,4 @@
 require 'json'
-require 'Open3'
 
 class PromoteReleaseCandidate
   def self.prepareReleaseCandidate()
