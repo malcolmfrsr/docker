@@ -13,7 +13,7 @@ class PromoteReleaseCandidate
       repository_name = repo["GitRepo"]
 
       branch = docker_service_name[docker_service_name.index(":")+ 1..docker_service_name.length]
-      prepare_version(repository_name, branch)
+      puts(prepare_version(repository_name, branch))
 
       # Then build
       puts ("ToDo : do a docker build here")
@@ -25,6 +25,7 @@ class PromoteReleaseCandidate
 
   def self.prepare_version(repository_name, branch)
     repository = GitRepository.new(repository_name, branch)
+    puts (repository.version)
     # TODO : I think I need to move this internally and surface as an attribute. (Thinking of the negative implication.)
     if ((repository.head) == (repository.fetch_revision(repository.version)))
       puts "Nothing has changed. Keeping #{repository.version}"
