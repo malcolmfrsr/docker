@@ -1,5 +1,5 @@
 require 'json'
-require_relative 'imqsgit'
+require_relative 'ImqsGit'
 
 class PromoteReleaseCandidate
   def self.prepareReleaseCandidate()
