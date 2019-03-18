@@ -16,7 +16,10 @@ class PromoteReleaseCandidate
       prepare_version(repository_name, branch)
 
       # Then build
-      puts (`#{docker_build_command}`)
+      puts ("ToDo : do a docker build here")
+
+      # Then build
+      puts ("ToDo : create manifest")
     }
   end
 
@@ -24,17 +27,17 @@ class PromoteReleaseCandidate
     repository = GitRepository.new(repository_name, branch)
     # TODO : I think I need to move this internally and surface as an attribute. (Thinking of the negative implication.)
     if ((repository.head) == (repository.fetch_revision(repository.version)))
-      puts "Nothing has changed. Keeping #{tag}"
-      return tag
+      puts "Nothing has changed. Keeping #{repository.version}"
+      return repository.version
     end
 
     # TODO : This could also be a possible attr on the repository class.
-    if (tag.to_s.include? "fatal: No names found, cannot describe anything")
+    if (repository.version.to_s.include? "fatal: No names found, cannot describe anything")
       repository.tag("v1.0")
     else
       # TODO : This as well ?
-      if tag.tr("\n", "").tr("v", "").is_float?
-        version_number = tag.tr("\n", "").tr("v", "").to_i
+      if repository.version.tr("\n", "").tr("v", "").is_float?
+        version_number = repository.version.tr("\n", "").tr("v", "").to_i
         version_number = (version_number.to_i + 1).to_f
         repository.tag("v#{version_number}")
         return version_number
