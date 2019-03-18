@@ -19,7 +19,7 @@ class GitRepository
     if !File.directory?(repository_folder)
       cmd = "git clone -b #{branch} #{repository_name}"
       system(cmd, out: $stdout, err: :out)
-      gitrepo = Dir.mkdir(repository_folder)
+      gitrepo = Dir.new(repository_folder)
     end
     gitrepo = Dir.chdir(repository_folder)
 
@@ -64,9 +64,12 @@ class GitRepository
   end
 
   # Fetches the last version.
-
   def fetch_latest_tag
     version_array = fetch_tags("-l \"#{VERSION_PREFIX}*\"  --sort=-#{VERSION_PREFIX}:refname")
+    if version_array.length > 0
     return version_array[0]
+    else
+      raise StandardError
+    end
   end
 end
